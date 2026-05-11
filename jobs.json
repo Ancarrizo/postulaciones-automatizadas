@@ -1,0 +1,42 @@
+[
+  {
+    "empresa": "Medihome",
+    "rol": "Asistente Administrativo RRHH",
+    "email": "rrhh@grupomedihome.com",
+    "cv": "CV_Andres_Carrizo_Salud.pdf",
+    "url": "https://grupomedihome.hiringroom.com/jobs",
+    "enviado": true
+  },
+  {
+    "empresa": "Instituto Médico Platense",
+    "rol": "CV espontáneo RRHH",
+    "email": "rrhh@institutomedicoplatense.com",
+    "cv": "CV_Andres_Carrizo_Salud.pdf",
+    "url": null,
+    "enviado": true
+  },
+  {
+    "empresa": "Edelap",
+    "rol": "CV espontáneo RRHH",
+    "email": "cv@edelap.com.ar",
+    "cv": "CV_Andres_Carrizo_Techint.docx",
+    "url": null,
+    "enviado": true
+  },
+  {
+    "empresa": "ABSA",
+    "rol": "CV espontáneo RRHH",
+    "email": "rrhh@absa.com.ar",
+    "cv": "CV_Andres_Carrizo_Techint.docx",
+    "url": null,
+    "enviado": true
+  },
+  {
+    "empresa": "Milan Lab Agency",
+    "rol": "Content Writer",
+    "email": "info@milanlabagency.com",
+    "cv": "CV_Andres_Carrizo_ENG.docx",
+    "url": null,
+    "enviado": true
+  }
+]

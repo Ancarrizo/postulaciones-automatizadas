@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postulaciones Automatizadas</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a1a; }
+
+  nav { background: #1a73e8; color: white; padding: 14px 32px; display: flex; align-items: center; gap: 24px; }
+  nav h1 { font-size: 18px; font-weight: 700; }
+  nav a { color: white; text-decoration: none; font-size: 14px; opacity: .85; }
+  nav a:hover { opacity: 1; }
+
+  .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 20px; }
+  .card h2 { font-size: 17px; margin-bottom: 16px; color: #1a73e8; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat { background: white; border-radius: 10px; padding: 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .stat .n { font-size: 32px; font-weight: 700; color: #1a73e8; }
+  .stat .l { font-size: 12px; color: #777; margin-top: 4px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #555; font-weight: 600; border-bottom: 2px solid #e0e0e0; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-ok  { background: #e6f4ea; color: #137333; }
+  .badge-pend { background: #fef9e0; color: #7a5800; }
+
+  input, select { width: 100%; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 10px; }
+  input:focus, select:focus { outline: none; border-color: #1a73e8; }
+  label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
+
+  .btn { padding: 9px 20px; border: none; border-radius: 7px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn-primary { background: #1a73e8; color: white; }
+  .btn-primary:hover { background: #1557b0; }
+  .btn-danger  { background: #ea4335; color: white; font-size: 12px; padding: 5px 12px; }
+  .btn-danger:hover { background: #c5221f; }
+  .btn-green   { background: #34a853; color: white; font-size: 18px; padding: 14px 32px; width: 100%; }
+  .btn-green:hover { background: #2d9148; }
+
+  .msg { background: #e6f4ea; color: #137333; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+  a.link-del { text-decoration: none; }
+</style>
+</head>
+<body>
+<nav>
+  <h1>📨 Postulaciones</h1>
+  <a href="/">Inicio</a>
+  <a href="/configurar">Configurar</a>
+  <a href="/correr">▶ Correr ahora</a>
+</nav>
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

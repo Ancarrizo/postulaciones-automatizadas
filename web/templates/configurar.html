@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>⚙️ Configuración</h2>
+  {% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+
+    <label>API Key de Anthropic (Claude)</label>
+    <input name="api_key" value="{{ env.get('ANTHROPIC_API_KEY', '') }}"
+           placeholder="sk-ant-..." required>
+
+    <label style="margin-top:8px">Subir CV (se guarda en la carpeta cvs/)</label>
+    <input type="file" name="cv" accept=".pdf,.docx" style="padding:6px">
+
+    <button class="btn btn-primary" type="submit" style="margin-top:12px">Guardar</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>🔐 Login en portales (una sola vez)</h2>
+  <p style="font-size:14px;color:#555;margin-bottom:16px">
+    Hace falta loguearte a mano la primera vez en cada portal para guardar la sesión.
+    Después el bot se loguea solo.
+  </p>
+  <a href="/login_portal/computrabajo">
+    <button class="btn btn-primary" style="margin-bottom:8px;width:100%">Loguearme en Computrabajo</button>
+  </a>
+  <a href="/login_portal/zonajobs">
+    <button class="btn btn-primary" style="margin-bottom:8px;width:100%">Loguearme en ZonaJobs</button>
+  </a>
+  <a href="/login_portal/bumeran">
+    <button class="btn btn-primary" style="width:100%">Loguearme en BumerAN</button>
+  </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card" style="text-align:center">
+  <h2>▶ Correr el sistema ahora</h2>
+  <p style="color:#555;font-size:14px;margin-bottom:24px">
+    Va a buscar ofertas, leer tu Gmail y crear los borradores con las cartas personalizadas.
+  </p>
+  <button class="btn btn-green" id="btn" onclick="iniciar()">▶ Iniciar ahora</button>
+</div>
+
+<div class="card" id="log-card" style="display:none">
+  <h2>📋 Output en tiempo real</h2>
+  <div id="log" style="font-family:monospace;font-size:13px;line-height:1.8;
+                        background:#1a1a1a;color:#00ff88;padding:20px;
+                        border-radius:8px;max-height:500px;overflow-y:auto;
+                        white-space:pre-wrap;"></div>
+</div>
+
+<script>
+function iniciar() {
+  document.getElementById("btn").disabled = true;
+  document.getElementById("btn").textContent = "⏳ Corriendo...";
+  document.getElementById("log-card").style.display = "block";
+
+  const log   = document.getElementById("log");
+  const source = new EventSource("/stream");
+
+  source.onmessage = function(e) {
+    if (e.data === "[FIN]") {
+      source.close();
+      document.getElementById("btn").textContent = "✅ ¡Listo!";
+      return;
+    }
+    log.textContent += e.data + "\n";
+    log.scrollTop = log.scrollHeight;
+  };
+
+  source.onerror = function() {
+    source.close();
+    document.getElementById("btn").disabled = false;
+    document.getElementById("btn").textContent = "▶ Iniciar ahora";
+  };
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+# Credenciales y sesiones — NUNCA subir
+.env
+token.json
+credentials.json
+sessions/
+vacantes_leidas.json
+
+# CVs personales
+cvs/
+
+# Logs
+borradores/
+jobs_cache_*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
