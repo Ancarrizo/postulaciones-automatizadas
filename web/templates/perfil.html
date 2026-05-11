@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>👤 Mi Perfil</h2>
+  {% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Nombre completo *</label>
+        <input name="nombre" required value="{{ perfil.get('nombre','') }}" placeholder="Juan Pérez">
+      </div>
+      <div>
+        <label>Email *</label>
+        <input name="email" type="email" required value="{{ perfil.get('email','') }}" placeholder="juan@gmail.com">
+      </div>
+      <div>
+        <label>Teléfono</label>
+        <input name="telefono" value="{{ perfil.get('telefono','') }}" placeholder="+54 11 1234-5678">
+      </div>
+      <div>
+        <label>Ubicación</label>
+        <input name="ubicacion" value="{{ perfil.get('ubicacion','') }}" placeholder="Buenos Aires, Argentina">
+      </div>
+    </div>
+
+    <label>LinkedIn</label>
+    <input name="linkedin" value="{{ perfil.get('linkedin','') }}" placeholder="linkedin.com/in/tu-usuario">
+
+    <label>Educación</label>
+    <textarea name="educacion" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;margin-bottom:10px" placeholder="Ej: Licenciado en Comunicación Social, UNLP, promedio 8.7">{{ perfil.get('educacion','') }}</textarea>
+
+    <label>Experiencia laboral</label>
+    <textarea name="experiencia" rows="5" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;margin-bottom:10px" placeholder="Ej:&#10;- Co-fundador de CaSa Comunicación (2026): agencia de comunicación...&#10;- Ventas y Marketing en Rodar Electric (2025): CRM, 50+ prospectos diarios...">{{ perfil.get('experiencia','') }}</textarea>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Idiomas</label>
+        <input name="idiomas" value="{{ perfil.get('idiomas','') }}" placeholder="Inglés B2, Portugués intermedio">
+      </div>
+      <div>
+        <label>Habilidades / Herramientas</label>
+        <input name="habilidades" value="{{ perfil.get('habilidades','') }}" placeholder="Office, CRM, Photoshop, HTML">
+      </div>
+      <div>
+        <label>Disponibilidad</label>
+        <input name="disponibilidad" value="{{ perfil.get('disponibilidad','') }}" placeholder="Inmediata">
+      </div>
+      <div>
+        <label>Pretensión salarial</label>
+        <input name="pretension" value="{{ perfil.get('pretension','') }}" placeholder="$1.800.000 ARS bruto">
+      </div>
+    </div>
+
+    <label style="margin-top:8px">CV (PDF o DOCX)</label>
+    <input type="file" name="cv" accept=".pdf,.docx" style="padding:6px;margin-bottom:4px">
+    {% if cv %}<div style="font-size:12px;color:#34a853;margin-bottom:10px">✓ CV actual: {{ cv }}</div>{% endif %}
+
+    <button class="btn btn-primary" type="submit" style="margin-top:12px;width:100%">Guardar perfil</button>
+  </form>
+</div>
+
+{% endblock %}

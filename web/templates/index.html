@@ -1,76 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="stats">
-  <div class="stat"><div class="n">{{ jobs|length }}</div><div class="l">Total empresas</div></div>
-  <div class="stat"><div class="n" style="color:#34a853">{{ enviadas }}</div><div class="l">Enviadas</div></div>
-  <div class="stat"><div class="n" style="color:#fbbc04">{{ pendientes }}</div><div class="l">Pendientes</div></div>
+{% if not perfil.nombre %}
+<div class="card" style="text-align:center;padding:40px">
+  <div style="font-size:48px;margin-bottom:16px">👋</div>
+  <h2 style="color:#1a1a1a;font-size:22px;margin-bottom:12px">Bienvenido al sistema de postulaciones</h2>
+  <p style="color:#666;margin-bottom:24px">Primero cargá tu perfil para que el sistema genere las cartas con tus datos.</p>
+  <a href="/perfil"><button class="btn btn-primary" style="font-size:16px;padding:12px 32px">Cargar mi perfil →</button></a>
 </div>
 
-<!-- Agregar nueva postulación -->
-<div class="card">
-  <h2>➕ Nueva postulación</h2>
-  <form action="/agregar" method="POST">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div>
-        <label>Empresa</label>
-        <input name="empresa" required placeholder="ej: Techint">
-      </div>
-      <div>
-        <label>Rol / Puesto</label>
-        <input name="rol" required placeholder="ej: Analista de Comunicación">
-      </div>
-      <div>
-        <label>Email de contacto</label>
-        <input name="email" type="email" required placeholder="rrhh@empresa.com">
-      </div>
-      <div>
-        <label>CV a adjuntar</label>
-        <select name="cv">
-          {% for cv in cvs %}
-          <option>{{ cv }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-    <label>Link a la oferta (opcional)</label>
-    <input name="url" placeholder="https://...">
-    <button class="btn btn-primary" type="submit">Agregar</button>
-  </form>
+{% else %}
+<div class="card" style="display:flex;align-items:center;gap:20px">
+  <div style="font-size:48px">👤</div>
+  <div>
+    <div style="font-size:20px;font-weight:700">{{ perfil.nombre }}</div>
+    <div style="color:#666;font-size:14px">{{ perfil.email }} · {{ perfil.ubicacion }}</div>
+    <a href="/perfil" style="font-size:13px;color:#1a73e8">Editar perfil</a>
+  </div>
+  <a href="/generar" style="margin-left:auto">
+    <button class="btn btn-primary" style="font-size:15px;padding:12px 28px">✍️ Generar carta</button>
+  </a>
 </div>
 
-<!-- Lista de postulaciones -->
-<div class="card">
-  <h2>📋 Lista de postulaciones</h2>
-  {% if jobs %}
-  <table>
-    <tr>
-      <th>Empresa</th><th>Rol</th><th>Email</th><th>CV</th><th>Estado</th><th></th>
-    </tr>
-    {% for j in jobs %}
-    <tr>
-      <td><strong>{{ j.empresa }}</strong></td>
-      <td>{{ j.rol }}</td>
-      <td>{{ j.email }}</td>
-      <td style="font-size:12px;color:#777">{{ j.cv }}</td>
-      <td>
-        {% if j.enviado %}
-          <span class="badge badge-ok">✓ Enviada</span>
-        {% else %}
-          <span class="badge badge-pend">Pendiente</span>
-        {% endif %}
-      </td>
-      <td>
-        <a class="link-del" href="/eliminar/{{ loop.index0 }}">
-          <button class="btn btn-danger">✕</button>
-        </a>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}
-    <p style="color:#999;text-align:center;padding:24px">No hay postulaciones todavía. Agregá una arriba.</p>
-  {% endif %}
+<div class="card" style="text-align:center;padding:32px">
+  <div style="font-size:36px;margin-bottom:12px">✍️</div>
+  <h2 style="color:#1a1a1a;margin-bottom:8px">¿Listo para postularte?</h2>
+  <p style="color:#666;margin-bottom:24px">Ingresá los datos de la oferta y Claude genera una carta personalizada para vos en segundos.</p>
+  <a href="/generar"><button class="btn btn-primary" style="font-size:16px;padding:12px 32px">Generar carta ahora →</button></a>
 </div>
+{% endif %}
 
 {% endblock %}

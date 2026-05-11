@@ -1,59 +1,68 @@
 """
-Generador de cartas + análisis de keywords + resumen profesional adaptado.
-Todo en una sola llamada cacheada a Claude.
+Generador de cartas + keywords + resumen profesional adaptado.
+Acepta cualquier perfil dinámico — multi-usuario.
 """
 
 import json
 import anthropic
 
-PERFIL = """
-Andrés Carrizo, 26 años, La Plata, Buenos Aires.
-- Licenciado en Comunicación Social, UNLP 2026, orientación Planificación. Promedio 8.7/10.
-- Co-fundador de CaSa Comunicación: agencia propia con clientes activos en educación, gastronomía y cosmetología.
-- Ventas / Marketing / Logística en Rodar Electric SRL (abril 2025 - actualidad): CRM, +50 prospectos diarios, logística end-to-end.
-- Asistente de Comunicación en Input Gym (2023).
-- 5 años en atención al cliente en Agencia de Lotería (2019-2024).
-- Idiomas: inglés intermedio-alto (B2), francés DELF A2 certificado, portugués intermedio.
-- Herramientas: Microsoft Office avanzado, CRM, Adobe Photoshop, Premiere, HTML/CSS.
-- Habilidades: redacción institucional, copywriting, estrategia de contenidos, gestión de equipos, KPIs.
-- Disponibilidad inmediata. Pretensión: $1.800.000 ARS bruto.
-""".strip()
-
-SYSTEM = f"""Sos un experto en Recursos Humanos y comunicación profesional argentina con 15 años de experiencia
-seleccionando candidatos y redactando postulaciones exitosas.
+SYSTEM_TEMPLATE = """Sos un experto en Recursos Humanos y comunicación profesional argentina con 15 años de experiencia.
 
 PERFIL DEL CANDIDATO:
-{PERFIL}
+{perfil}
 
-Tu tarea es analizar cada oferta laboral y producir tres cosas en formato JSON:
+Tu tarea es analizar la oferta laboral y producir tres cosas en formato JSON:
 
 1. "keywords": lista de 5-8 palabras o frases clave de la oferta que el candidato cumple
-2. "resumen": párrafo de 2-3 líneas para el encabezado del CV, adaptado a esta oferta específica.
-   Debe sonar natural, destacar lo más relevante para ESE puesto, en primera persona, sin clichés.
-3. "carta": carta de presentación completa. Máximo 3 párrafos cortos. Tono humano y directo,
-   español rioplatense. Sin frases como "soy proactivo", "me apasiona", "me considero".
-   Usá logros concretos. Último párrafo: cierre que invite a entrevista. Sin firma.
+2. "resumen": párrafo de 2-3 líneas para el encabezado del CV, adaptado a esta oferta.
+   Natural, en primera persona, sin clichés, destacando lo más relevante para ESE puesto.
+3. "carta": carta de presentación. Máximo 3 párrafos cortos. Tono humano, directo,
+   español rioplatense. Sin "soy proactivo", "me apasiona", "me considero".
+   Usá logros concretos del perfil. Último párrafo: cierre que invite a entrevista. Sin firma.
 
 Respondé SOLO con JSON válido, sin markdown, con exactamente estas tres claves: keywords, resumen, carta.
 """
 
-FIRMA = (
+FIRMA_TEMPLATE = (
     "\n\nQuedo a disposición ante cualquier consulta.\n\n"
-    "Andrés Carrizo\n"
-    "+54 221 502-6532 | Andicarrizo5@gmail.com\n"
-    "linkedin.com/in/andressalvadorcarrizo"
+    "{nombre}\n"
+    "{telefono} | {email}\n"
+    "{linkedin}"
 )
 
 
-def generar_todo(empresa: str, rol: str, descripcion: str, client: anthropic.Anthropic) -> dict:
-    """
-    Genera en una sola llamada:
-    - keywords relevantes de la oferta
-    - resumen profesional adaptado para el CV
-    - carta de presentación personalizada
+def construir_perfil_texto(perfil: dict) -> str:
+    """Convierte el dict de perfil en texto para el prompt."""
+    lineas = [
+        f"Nombre: {perfil.get('nombre', '')}",
+        f"Ubicación: {perfil.get('ubicacion', '')}",
+        f"Email: {perfil.get('email', '')}",
+    ]
+    if perfil.get("linkedin"):
+        lineas.append(f"LinkedIn: {perfil['linkedin']}")
+    if perfil.get("educacion"):
+        lineas.append(f"Educación: {perfil['educacion']}")
+    if perfil.get("experiencia"):
+        lineas.append(f"Experiencia:\n{perfil['experiencia']}")
+    if perfil.get("idiomas"):
+        lineas.append(f"Idiomas: {perfil['idiomas']}")
+    if perfil.get("habilidades"):
+        lineas.append(f"Habilidades: {perfil['habilidades']}")
+    if perfil.get("disponibilidad"):
+        lineas.append(f"Disponibilidad: {perfil['disponibilidad']}")
+    if perfil.get("pretension"):
+        lineas.append(f"Pretensión salarial: {perfil['pretension']}")
+    return "\n".join(lineas)
 
-    Retorna dict con claves: keywords, resumen, carta
+
+def generar_todo(empresa: str, rol: str, descripcion: str,
+                 client: anthropic.Anthropic, perfil: dict) -> dict:
     """
+    Genera carta + keywords + resumen para cualquier perfil.
+    """
+    perfil_texto = construir_perfil_texto(perfil)
+    system = SYSTEM_TEMPLATE.format(perfil=perfil_texto)
+
     prompt = (
         f"OFERTA:\n"
         f"Empresa: {empresa}\n"
@@ -65,31 +74,32 @@ def generar_todo(empresa: str, rol: str, descripcion: str, client: anthropic.Ant
     resp = client.messages.create(
         model="claude-sonnet-4-5",
         max_tokens=1000,
-        system=[
-            {
-                "type": "text",
-                "text": SYSTEM,
-                "cache_control": {"type": "ephemeral"},  # perfil cacheado
-            }
-        ],
+        system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": prompt}],
     )
 
     try:
         data = json.loads(resp.content[0].text.strip())
     except Exception:
-        # fallback si el JSON viene mal
         data = {
             "keywords": [],
-            "resumen": f"Licenciado en Comunicación Social con experiencia en {rol}.",
+            "resumen": f"Profesional con experiencia en {rol}.",
             "carta": resp.content[0].text.strip(),
         }
 
-    # Agregar firma a la carta
-    data["carta"] = data.get("carta", "").strip() + FIRMA
+    # Firma dinámica con datos del perfil
+    firma = FIRMA_TEMPLATE.format(
+        nombre   = perfil.get("nombre", ""),
+        telefono = perfil.get("telefono", ""),
+        email    = perfil.get("email", ""),
+        linkedin = perfil.get("linkedin", ""),
+    )
+    data["carta"] = data.get("carta", "").strip() + firma
     return data
 
 
-def generar_carta(empresa: str, rol: str, client: anthropic.Anthropic, descripcion: str = "") -> str:
-    """Compatibilidad con el código existente — retorna solo la carta."""
-    return generar_todo(empresa, rol, descripcion, client)["carta"]
+def generar_carta(empresa: str, rol: str, client: anthropic.Anthropic,
+                  descripcion: str = "", perfil: dict = None) -> str:
+    """Compatibilidad con código existente."""
+    perfil = perfil or {}
+    return generar_todo(empresa, rol, descripcion, client, perfil)["carta"]

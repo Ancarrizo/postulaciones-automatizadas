@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>✍️ Generar carta de presentación</h2>
+  {% if error %}<div style="background:#fce8e6;color:#c5221f;padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:14px">{{ error }}</div>{% endif %}
+
+  <form method="POST">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Empresa *</label>
+        <input name="empresa" required placeholder="ej: Techint" value="{{ request.form.get('empresa','') }}">
+      </div>
+      <div>
+        <label>Puesto / Rol *</label>
+        <input name="rol" required placeholder="ej: Analista de Comunicación" value="{{ request.form.get('rol','') }}">
+      </div>
+    </div>
+    <label>Descripción de la oferta (pegala acá para mejor resultado)</label>
+    <textarea name="descripcion" rows="5"
+      style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;margin-bottom:10px"
+      placeholder="Pegá la descripción del puesto para que Claude pueda personalizar mejor la carta...">{{ request.form.get('descripcion','') }}</textarea>
+
+    <button class="btn btn-primary" type="submit" style="width:100%" id="btn" onclick="this.textContent='⏳ Generando...'">
+      ✨ Generar carta
+    </button>
+  </form>
+</div>
+
+{% if resultado %}
+<div class="card">
+  <h2>🎯 Keywords de la oferta que matcheás</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+    {% for kw in resultado.keywords %}
+    <span style="background:#e8f0fe;color:#1557b0;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:500">{{ kw }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>📄 Resumen para el CV</h2>
+  <p style="font-size:13px;color:#888;margin-bottom:10px">Pegá esto al principio de tu CV para esta postulación:</p>
+  <div style="position:relative">
+    <textarea id="resumen" rows="3"
+      style="width:100%;padding:12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;line-height:1.6;background:#fafafa;font-family:inherit">{{ resultado.resumen }}</textarea>
+    <button onclick="copiar('resumen', this)" class="btn" style="position:absolute;top:8px;right:8px;background:#e8f0fe;color:#1557b0;padding:5px 12px;font-size:12px">📋 Copiar</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>✉️ Carta de presentación</h2>
+  <p style="font-size:13px;color:#888;margin-bottom:10px">
+    Para: <strong>{{ resultado.empresa }}</strong> · Puesto: <strong>{{ resultado.rol }}</strong>
+  </p>
+  <div style="position:relative">
+    <textarea id="carta" rows="14"
+      style="width:100%;padding:12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;line-height:1.7;background:#fafafa;font-family:inherit">{{ resultado.carta }}</textarea>
+    <button onclick="copiar('carta', this)" class="btn" style="position:absolute;top:8px;right:8px;background:#e8f0fe;color:#1557b0;padding:5px 12px;font-size:12px">📋 Copiar</button>
+  </div>
+
+  <div style="margin-top:16px;display:flex;gap:10px">
+    <button onclick="window.print()" class="btn" style="background:#f1f3f4;color:#333">🖨️ Imprimir / PDF</button>
+    <a href="/generar"><button class="btn" style="background:#f1f3f4;color:#333">↩ Nueva carta</button></a>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:#323232;color:white;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none">
+  ¡Copiado al portapapeles!
+</div>
+
+<script>
+function copiar(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).value);
+  const toast = document.getElementById('toast');
+  toast.style.opacity = 1;
+  setTimeout(() => toast.style.opacity = 0, 2000);
+}
+</script>
+{% endif %}
+
+{% endblock %}
